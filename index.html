@@ -3,37 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Voidza | Giriş</title>
+    <title>The Voidza | Başlangıç</title>
     <style>
         body {
             margin: 0;
-            background: #0a0a0a;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Georgia', serif; /* Tatlı ama cüretkar serif yazı tipi */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: #00ffcc;
-            font-family: 'Courier New', Courier, monospace;
             overflow: hidden;
         }
-        .loading {
+        .welcome-container {
             text-align: center;
+            opacity: 0;
+            animation: fadeIn 2s forwards 0.5s;
         }
-        .shimmer {
-            font-size: 24px;
-            letter-spacing: 5px;
-            animation: glow 2s infinite ease-in-out;
+        h1 {
+            font-size: 64px;
+            font-weight: 300;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
         }
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 10px #00ffcc; opacity: 0.5; }
-            50% { text-shadow: 0 0 30px #00ffcc; opacity: 1; }
+        p {
+            font-size: 18px;
+            opacity: 0.7;
+            font-style: italic;
+        }
+        .voidza-dot {
+            color: #ff3300; /* Vahşi kırmızı vurgu */
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
         }
     </style>
     <meta http-equiv="refresh" content="3;url=anamenu.html">
 </head>
 <body>
-    <div class="loading">
-        <div class="shimmer">THE VOIDZA YÜKLENİYOR...</div>
+    <div class="welcome-container">
+        <h1>THE VOIDZA<span class="voidza-dot">.</span></h1>
+        <p>Dünyanın en derin tavşan deliğine hoş geldin...</p>
     </div>
 </body>
 </html>
