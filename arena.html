@@ -3,505 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>THE ARENA | Architect ile Yüzleşme</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>THE ARENA | Zihin Oyunları</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
 
     <style>
-        /* TEMEL DEĞİŞKENLER VE SIFIRLAMA */
         :root {
             --bg-cream: #F4F1EA;
             --bar-burgundy: #4A0E17;
-            --dark-void: #111111;
             --gold-accent: #C5A059;
             --text-dark: #2B2B2B;
-            --text-light: #EAE6DB;
-            --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --white-sq: #EBECD0;
+            --black-sq: #779556; /* Huzurlu klasik yeşil tahta */
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg-cream);
             font-family: 'Cormorant Garamond', serif;
             color: var(--text-dark);
+            margin: 0;
             background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
         }
 
-        /* GERİ DÖNÜŞ BUTONU */
         .back-home {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
+            position: absolute;
+            top: 20px; left: 20px;
             color: var(--bar-burgundy);
             text-decoration: none;
             font-family: 'Cinzel', serif;
             font-size: 12px;
-            letter-spacing: 2px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: rgba(244, 241, 234, 0.8);
-            backdrop-filter: blur(5px);
-            border-radius: 4px;
+            display: flex; align-items: center; gap: 8px;
+            z-index: 100;
         }
 
-        /* ARENA ANA TAŞIYICI */
-        .arena-wrapper {
-            padding-top: 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .arena-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .arena-title {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(1.8rem, 5vw, 2.8rem);
-            color: var(--bar-burgundy);
-            letter-spacing: 10px;
-            font-weight: 700;
-        }
-
-        .arena-status {
-            font-family: 'Fira Code', monospace;
-            font-size: 11px;
-            color: var(--gold-accent);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-top: 10px;
-        }
-                /* --- SATRANÇ TAHTASI VE KONTROL PANELİ --- */
-        .combat-zone {
+        .arena-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 20px;
             display: grid;
             grid-template-columns: 1fr 350px;
-            gap: 40px;
-            width: 100%;
-            padding: 20px;
+            gap: 30px;
         }
 
-        /* Tahta Alanı */
-        #board-container {
+        #board-wrapper {
             width: 100%;
-            max-width: 600px;
-            justify-self: end;
-            position: relative;
-        }
-
-        #myBoard {
-            width: 100%;
-            border: 8px solid var(--bar-burgundy);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            max-width: 550px;
+            border: 10px solid var(--bar-burgundy);
             border-radius: 4px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
         }
 
-        /* Architect ve Durum Paneli */
-        .side-panel {
+        .info-panel {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .architect-card {
-            background: var(--dark-void);
-            border: 1px solid var(--gold-accent);
+        .architect-box {
+            background: white;
+            border: 1px solid rgba(74, 14, 23, 0.1);
             padding: 25px;
             border-radius: 4px;
-            position: relative;
-            overflow: hidden;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        .architect-card::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--bar-burgundy);
-        }
-
-        .architect-name {
+        .architect-box h3 {
             font-family: 'Cinzel', serif;
-            color: var(--gold-accent);
             font-size: 14px;
-            letter-spacing: 3px;
-            margin-bottom: 15px;
-            display: block;
+            color: var(--gold-accent);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
         }
 
-        #architect-dialogue {
-            font-family: 'Cormorant Garamond', serif;
-            color: var(--text-light);
-            font-size: 18px;
+        #dialogue {
             font-style: italic;
-            line-height: 1.6;
-            min-height: 80px;
+            font-size: 18px;
+            color: var(--bar-burgundy);
         }
 
-        /* Saatler ve Skorlar */
-        .stats-grid {
+        .timer-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
 
-        .stat-box {
-            background: white;
-            padding: 20px;
-            border: 1px solid rgba(74, 14, 23, 0.1);
+        .timer-card {
+            background: var(--bar-burgundy);
+            color: white;
+            padding: 15px;
             text-align: center;
+            border-radius: 4px;
         }
 
-        .stat-label {
-            font-family: 'Fira Code', monospace;
-            font-size: 9px;
-            color: var(--bar-burgundy);
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-            display: block;
-        }
+        .timer-label { font-family: 'Fira Code', monospace; font-size: 9px; opacity: 0.8; }
+        .timer-val { font-family: 'Cinzel', serif; font-size: 24px; font-weight: bold; }
 
-        .stat-value {
-            font-family: 'Cinzel', serif;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        /* MOBİL UYUM */
         @media (max-width: 900px) {
-            .combat-zone {
-                grid-template-columns: 1fr;
-                padding: 10px;
-            }
-            #board-container { justify-self: center; }
-            .side-panel { order: 2; }
+            .arena-container { grid-template-columns: 1fr; margin-top: 40px; }
+            #board-wrapper { max-width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-home">
-        <i class="fa-solid fa-arrow-left"></i> PORTAL'A DÖN
-    </a>
+    <a href="index.html" class="back-home"><i class="fa-solid fa-arrow-left"></i> GERİ DÖN</a>
 
-    <div class="arena-wrapper">
-        <header class="arena-header">
-            <h1 class="arena-title">THE ARENA</h1>
-            <div class="arena-status">Sistem: Aktif | Rakip: The Architect</div>
-        </header>
+    <div class="arena-container">
+        <div id="board-wrapper">
+            <div id="myBoard"></div>
+        </div>
 
-        <main class="combat-zone">
-            <section id="board-container">
-                <div id="myBoard"></div>
-            </section>
+        <div class="info-panel">
+            <div class="architect-box">
+                <h3>ARCHITECT</h3>
+                <p id="dialogue">Sıra sende Ali. İlk hamleni yap, zihnini analiz etmeye başlayayım.</p>
+            </div>
 
-            <aside class="side-panel">
-                <div class="architect-card">
-                    <span class="architect-name">THE ARCHITECT DİYOR Kİ:</span>
-                    <p id="architect-dialogue">"Zayıf bir başlangıç, Ali Eren. Bakalım zihninde kaç hamle ötesini görebiliyorsun?"</p>
+            <div class="timer-grid">
+                <div class="timer-card">
+                    <div class="timer-label">SİZ</div>
+                    <div class="timer-val" id="user-time">10:00</div>
                 </div>
+                <div class="timer-card" style="background: var(--gold-accent);">
+                    <div class="timer-label">ARCHITECT</div>
+                    <div class="timer-val" id="ai-time">10:00</div>
+                </div>
+            </div>
 
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <span class="stat-label">SİZİN SAATİNİZ</span>
-                        <div class="stat-value" id="user-timer">10:00</div>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">ARCHITECT SAATİ</span>
-                        <div class="stat-value" id="ai-timer">10:00</div>
-                    </div>
-                </div>
-                
-                <div class="stat-box" style="width: 100%;">
-                    <span class="stat-label">DURUM ANALİZİ</span>
-                    <div class="stat-value" id="game-status" style="font-size: 14px; letter-spacing: 1px;">Sıra Beyazda</div>
-                </div>
-            </aside>
-        </main>
+            <div class="architect-box" style="min-height: auto;">
+                <h3 id="game-status">BEYAZIN SIRASI</h3>
+            </div>
+            
+            <button onclick="resetGame()" style="background: none; border: 1px solid var(--bar-burgundy); padding: 10px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px;">OYUNU SIFIRLA</button>
+        </div>
     </div>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
 
     <script>
-        // SİSTEM DEĞİŞKENLERİ
         var board = null;
         var game = new Chess();
-        var $status = $('#game-status');
-        var $userTimer = $('#user-timer');
-        var $aiTimer = $('#ai-timer');
-        var $dialogue = $('#architect-dialogue');
+        var stockfish = new Worker('https://npmcdn.com/stockfish.js@0.10.2/stockfish.js');
+        var engineStatus = {};
 
-        // TAHTA AYARLARI
-        var config = {
-            draggable: true, // Taşlar sürüklenebilir olsun
-            position: 'start', // Diziliş başlangıç pozisyonu
-            orientation: 'white', // Ali Eren beyazlarla oynar
-            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
-            
-            // Bu fonksiyonlar bir sonraki Part'ta detaylandırılacak
-            onDragStart: onDragStart,
-            onDrop: onDrop,
-            onSnapEnd: onSnapEnd
-        };
-
-        // TAHTAYI OLUŞTUR
-        board = Chessboard('myBoard', config);
-
-        // İLK ATEŞLEME MESAJI (Architect seni karşılıyor)
-        window.onload = function() {
-            updateStatus();
-            console.log("Arena Hazır. Architect rakibini bekliyor...");
-        };
-
-        // --- BURADA DUR, FONKSİYONLARI BİR SONRAKİ PART'TA YAZACAĞIZ ---
-                // 1. HAMLE BAŞLAMA KONTROLÜ
-        function onDragStart (source, piece, position, orientation) {
-            // Oyun bittiyse veya yanlış renkteki taş sürükleniyorsa engelle
-            if (game.game_over()) return false;
-
-            // Sadece beyaz taşların (Ali Eren) hareketine izin ver (Sıra ondayken)
-            if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-                (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-                return false;
+        // STOCKFISH AYARLARI
+        stockfish.onmessage = function(event) {
+            var line = event.data;
+            if (line.indexOf('bestmove') > -1) {
+                var move = line.split(' ')[1];
+                makeBestMove(move);
             }
+        };
+
+        function makeBestMove(move) {
+            var from = move.substring(0, 2);
+            var to = move.substring(2, 4);
+            game.move({ from: from, to: to, promotion: 'q' });
+            board.position(game.fen());
+            updateStatus();
         }
 
-        // 2. HAMLE YAPILDIĞINDA (BIRAKILDIĞINDA)
+        function onDragStart (source, piece, position, orientation) {
+            if (game.game_over()) return false;
+            if (piece.search(/^b/) !== -1) return false;
+        }
+
         function onDrop (source, target) {
-            // Hamleyi doğrula ve yap
             var move = game.move({
                 from: source,
                 to: target,
-                promotion: 'q' // Piyon sona giderse otomatik vezir yap (Şimdilik)
+                promotion: 'q'
             });
 
-            // Hamle geçersizse taşı eski yerine döndür
             if (move === null) return 'snapback';
 
-            // Hamle geçerliyse durumu güncelle
             updateStatus();
             
-            // ARCHITECT'İN CEVABI İÇİN KISA BİR GECİKME (Part 5'te motoru bağlayacağız)
-            window.setTimeout(makeRandomMove, 250);
+            // Stockfish'e hamle sırasını ver
+            stockfish.postMessage('position fen ' + game.fen());
+            stockfish.postMessage('go depth 10'); // Zorluk seviyesi (Zaman/Derinlik)
         }
 
-        // 3. TAHTA POZİSYONUNU SENKRONİZE ET
         function onSnapEnd () {
             board.position(game.fen());
         }
 
-        // 4. DURUM GÜNCELLEME SİSTEMİ
         function updateStatus () {
-            var status = '';
-            var moveColor = 'Beyaz (Siz)';
-            if (game.turn() === 'b') {
-                moveColor = 'Siyah (Architect)';
-            }
-
-            // Şah Mat mı?
-            if (game.in_checkmate()) {
-                status = 'OYUN BİTTİ: ' + moveColor + ' mat oldu.';
-                $dialogue.text("Mat... Beklenen son. Zeka her zaman kazanır, Ali Eren.");
-            }
-            // Berabere mi?
-            else if (game.in_draw()) {
-                status = 'OYUN BİTTİ: Berabere.';
-                $dialogue.text("Beraberlik mi? Bir dahaki sefere bu kadar şanslı olmayacaksın.");
-            }
-            // Oyun Devam Ediyor mu?
-            else {
-                status = moveColor + ' hamle yapıyor.';
-                if (game.in_check()) {
-                    status += ' (ŞAH!)';
-                    $dialogue.text("Şah! Köşeye sıkışıyorsun, hamlelerini daha dikkatli seç.");
-                }
-            }
-
-            $status.text(status);
-        }
-
-        // GEÇİCİ: ARCHITECT'İN RASTGELE HAMLE YAPMASI (Part 5'te Zeka eklenecek)
-        function makeRandomMove () {
-            var possibleMoves = game.moves();
-
-            // Oyun bittiyse dur
-            if (possibleMoves.length === 0) return;
-
-            var randomIndex = Math.floor(Math.random() * possibleMoves.length);
-            game.move(possibleMoves[randomIndex]);
-            board.position(game.fen());
-            updateStatus();
-            }
-                // --- 5. PART 5: ZAMAN MOTORU VE SAAT KONTROLÜ ---
-
-        var userSeconds = 600; // 10 Dakika
-        var aiSeconds = 600;
-        var timerId = null;
-
-        // SAATLERİ BAŞLAT
-        function startTimer() {
-            if (timerId) clearInterval(timerId);
+            var status = 'Sıra: ' + (game.turn() === 'w' ? 'Beyaz' : 'Siyah');
+            if (game.in_checkmate()) status = 'MAT! Oyun bitti.';
+            if (game.in_draw()) status = 'BERABERE!';
             
-            timerId = setInterval(function() {
-                if (game.game_over()) {
-                    clearInterval(timerId);
-                    return;
-                }
-
-                // Sıra kimdeyse onun süresini azalt
-                if (game.turn() === 'w') {
-                    userSeconds--;
-                    if (userSeconds <= 0) endGameByTime('Ali Eren');
-                    updateTimerDisplay($userTimer, userSeconds);
-                } else {
-                    aiSeconds--;
-                    if (aiSeconds <= 0) endGameByTime('Architect');
-                    updateTimerDisplay($aiTimer, aiSeconds);
-                }
-            }, 1000);
-        }
-
-        // ZAMANI FORMATLA (Örn: 09:45)
-        function updateTimerDisplay($element, totalSeconds) {
-            var minutes = Math.floor(totalSeconds / 60);
-            var seconds = totalSeconds % 60;
-            var display = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-            $element.text(display);
+            $('#game-status').text(status.toUpperCase());
             
-            // Son 1 dakika uyarısı (Bordo renge dönerek gerilim yaratır)
-            if (totalSeconds < 60) {
-                $element.css('color', '#4A0E17');
-                $element.addClass('animate__animated animate__pulse animate__infinite');
-            }
+            const quotes = ["Güzel hamle Ali.", "Zayıf bir nokta buldum...", "Zamanın azalıyor.", "Analiz tamamlandı."];
+            if(game.turn() === 'b') $('#dialogue').text(quotes[Math.floor(Math.random() * quotes.length)]);
         }
 
-        // SÜRE BİTTİĞİNDE
-        function endGameByTime(loser) {
-            clearInterval(timerId);
-            var winner = (loser === 'Ali Eren') ? 'Architect' : 'Ali Eren';
-            $status.text("ZAMAN BİTTİ: " + winner + " kazandı!");
-            $dialogue.text("Zaman en büyük düşmanındır. Sen bittin, ama saat hala işliyor.");
-        }
-
-        // HAMLE YAPILDIĞINDA SAATİ TETİKLE (onDrop fonksiyonunu güncellemiş oluyoruz)
-        // Not: Bu satırı onDrop fonksiyonunun içindeki 'updateStatus()'un altına eklemelisin.
-        // Ama şimdilik burada kalsın, çalışacaktır.
-        if (!timerId && !game.game_over()) {
-            startTimer();
-        }
-                // --- 6. PART 6: ZEKA VE DİYALOG MOTORU ---
-
-        // ARCHITECT'İN "BİRAZ DAHA AKILLI" HAMLE YAPMASI
-        function makeArchitectMove() {
-            var possibleMoves = game.moves();
-            if (possibleMoves.length === 0) return;
-
-            // 1. ÖNCE MAT VAR MI DİYE BAK
-            var move = null;
-            for (var i = 0; i < possibleMoves.length; i++) {
-                game.move(possibleMoves[i]);
-                if (game.in_checkmate()) {
-                    move = possibleMoves[i];
-                    game.undo();
-                    break;
-                }
-                game.undo();
-            }
-
-            // 2. MAT YOKSA, DEĞERLİ TAŞ ALABİLİYOR MUYUZ? (BASİT YEMLEME)
-            if (!move) {
-                var bestValue = -1;
-                for (var i = 0; i < possibleMoves.length; i++) {
-                    var testMove = game.move(possibleMoves[i]);
-                    if (testMove.captured) {
-                        var values = { p: 1, n: 3, b: 3, r: 5, q: 9 };
-                        if (values[testMove.captured] > bestValue) {
-                            bestValue = values[testMove.captured];
-                            move = possibleMoves[i];
-                        }
-                    }
-                    game.undo();
-                }
-            }
-
-            // 3. HİÇBİRİ YOKSA RASTGELE OYNA
-            if (!move) {
-                var randomIndex = Math.floor(Math.random() * possibleMoves.length);
-                move = possibleMoves[randomIndex];
-            }
-
-            game.move(move);
-            board.position(game.fen());
+        function resetGame() {
+            game.reset();
+            board.start();
             updateStatus();
-            architectTalk(move); // Mimarı konuştur
         }
 
-        // DİYALOG MOTORU (Architect'in tepkileri)
-        function architectTalk(move) {
-            const dialogues = [
-                "İlginç bir hamle... Ama yeterli değil.",
-                "Zihnindeki bir sonraki adımı görebiliyorum, Ali.",
-                "Tahtadaki kaos benim dostumdur.",
-                "Bir taşı feda etmek, bir savaşı kazanmak içindir.",
-                "Hala bir insan gibi düşünüyorsun. Verimsiz.",
-                "Hamlen mantıklıydı, ama bu Arena mantıktan daha fazlasını ister."
-            ];
+        var config = {
+            draggable: true,
+            position: 'start',
+            onDragStart: onDragStart,
+            onDrop: onDrop,
+            onSnapEnd: onSnapEnd,
+            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+        };
 
-            // Eğer taş aldıysa veya şah çektiyse tepkisi değişsin
-            if (game.in_check()) {
-                $dialogue.text("Şah! Çember daralıyor, Ali Eren.");
-            } else if (move.includes('x')) {
-                $dialogue.text("O taşı gerçekten koruyabileceğini mi sandın?");
-            } else {
-                // Rastgele bir laf sok
-                var randomQuote = dialogues[Math.floor(Math.random() * dialogues.length)];
-                $dialogue.text(randomQuote);
-            }
-        }
-
-        // ESKİ makeRandomMove ÇAĞRISINI makeArchitectMove İLE DEĞİŞTİRİYORUZ
-        // (onDrop fonksiyonu artık bunu çağıracak)
-                // --- 7. PART 7: MOBİL UYUM VE NİHAİ KİLİT ---
-
-        // 1. TAHTAYI EKRAN BOYUTUNA GÖRE AYARLA (Mobil Fix)
-        $(window).resize(function() {
-            board.resize();
-        });
-
-        // 2. ONDROP FONKSİYONUNU GÜNCELLEME (Zekayı Bağlama)
-        // Not: Bu fonksiyonu yukarıda zaten yazdık ama Architect'in 
-        // rastgele yerine akıllı oynaması için ismini buraya sabitliyoruz.
-        function makeRandomMove() {
-            makeArchitectMove(); 
-        }
-
-        // 3. SAYFAYI KAYDIRMAYI ENGELLE (Sadece oyun alanında)
-        document.getElementById('myBoard').addEventListener('touchmove', function(e) {
-            e.preventDefault();
-        }, { passive: false });
-
-        console.log("THE VOIDZA: Arena Motoru Başlatıldı. Mimara Karşı Başarılar Ali.");
+        board = Chessboard('myBoard', config);
+        $(window).resize(board.resize);
     </script>
 </body>
 </html>
-
-    
-    
-        
