@@ -15,8 +15,6 @@
             --bar-burgundy: #4A0E17;
             --gold-accent: #C5A059;
             --text-dark: #2B2B2B;
-            --white-sq: #EBECD0;
-            --black-sq: #779556; /* Huzurlu klasik yeşil tahta */
         }
 
         body {
@@ -32,86 +30,111 @@
         }
 
         .back-home {
-            position: absolute;
-            top: 20px; left: 20px;
+            position: relative;
+            margin: 20px 0 0 20px;
             color: var(--bar-burgundy);
             text-decoration: none;
             font-family: 'Cinzel', serif;
             font-size: 12px;
-            display: flex; align-items: center; gap: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             z-index: 100;
         }
 
         .arena-container {
             max-width: 1000px;
-            margin: 60px auto;
+            margin: 20px auto;
             padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 30px;
-        }
-
-        #board-wrapper {
-            width: 100%;
-            max-width: 550px;
-            border: 10px solid var(--bar-burgundy);
-            border-radius: 4px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-        }
-
-        .info-panel {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
+        /* TAHTA SABİTLEME: Mobilde ezilmeyi önler */
+        #board-wrapper {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            border: 8px solid var(--bar-burgundy);
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        #myBoard {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Kare formunu korur */
+        }
+
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
         .architect-box {
             background: white;
             border: 1px solid rgba(74, 14, 23, 0.1);
-            padding: 25px;
+            padding: 20px;
             border-radius: 4px;
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
         }
 
         .architect-box h3 {
             font-family: 'Cinzel', serif;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--gold-accent);
-            margin-bottom: 10px;
+            margin: 0 0 10px 0;
             letter-spacing: 2px;
         }
 
         #dialogue {
             font-style: italic;
-            font-size: 18px;
+            font-size: 17px;
             color: var(--bar-burgundy);
+            margin: 0;
         }
 
         .timer-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px;
         }
 
         .timer-card {
             background: var(--bar-burgundy);
             color: white;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
             border-radius: 4px;
         }
 
-        .timer-label { font-family: 'Fira Code', monospace; font-size: 9px; opacity: 0.8; }
-        .timer-val { font-family: 'Cinzel', serif; font-size: 24px; font-weight: bold; }
+        .timer-label { font-family: 'Fira Code', monospace; font-size: 8px; opacity: 0.8; }
+        .timer-val { font-family: 'Cinzel', serif; font-size: 20px; }
 
-        @media (max-width: 900px) {
-            .arena-container { grid-template-columns: 1fr; margin-top: 40px; }
-            #board-wrapper { max-width: 100%; }
+        .status-bar {
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            color: var(--gold-accent);
+            letter-spacing: 1px;
         }
+
+        button {
+            background: white;
+            border: 1px solid var(--bar-burgundy);
+            padding: 12px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        button:hover { background: var(--bar-burgundy); color: white; }
     </style>
 </head>
 <body>
@@ -126,7 +149,7 @@
         <div class="info-panel">
             <div class="architect-box">
                 <h3>ARCHITECT</h3>
-                <p id="dialogue">Sıra sende Ali. İlk hamleni yap, zihnini analiz etmeye başlayayım.</p>
+                <p id="dialogue">Sıra sende Ali. Bakalım zihninde kaç hamle ötesini görebiliyorsun?</p>
             </div>
 
             <div class="timer-grid">
@@ -140,11 +163,11 @@
                 </div>
             </div>
 
-            <div class="architect-box" style="min-height: auto;">
-                <h3 id="game-status">BEYAZIN SIRASI</h3>
+            <div class="architect-box">
+                <div class="status-bar" id="game-status">BEYAZIN SIRASI</div>
             </div>
             
-            <button onclick="resetGame()" style="background: none; border: 1px solid var(--bar-burgundy); padding: 10px; cursor: pointer; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px;">OYUNU SIFIRLA</button>
+            <button onclick="resetGame()">OYUNU SIFIRLA</button>
         </div>
     </div>
 
@@ -155,59 +178,43 @@
     <script>
         var board = null;
         var game = new Chess();
+        
+        // Stockfish Motoru (WASM - Tarayıcıda Çalışan Gerçek AI)
         var stockfish = new Worker('https://npmcdn.com/stockfish.js@0.10.2/stockfish.js');
-        var engineStatus = {};
 
-        // STOCKFISH AYARLARI
         stockfish.onmessage = function(event) {
-            var line = event.data;
-            if (line.indexOf('bestmove') > -1) {
-                var move = line.split(' ')[1];
-                makeBestMove(move);
+            if (event.data.indexOf('bestmove') > -1) {
+                var move = event.data.split(' ')[1];
+                game.move({ from: move.substring(0,2), to: move.substring(2,4), promotion: 'q' });
+                board.position(game.fen());
+                updateStatus();
             }
         };
 
-        function makeBestMove(move) {
-            var from = move.substring(0, 2);
-            var to = move.substring(2, 4);
-            game.move({ from: from, to: to, promotion: 'q' });
-            board.position(game.fen());
-            updateStatus();
-        }
-
         function onDragStart (source, piece, position, orientation) {
-            if (game.game_over()) return false;
-            if (piece.search(/^b/) !== -1) return false;
+            if (game.game_over() || piece.search(/^b/) !== -1) return false;
         }
 
         function onDrop (source, target) {
-            var move = game.move({
-                from: source,
-                to: target,
-                promotion: 'q'
-            });
-
+            var move = game.move({ from: source, to: target, promotion: 'q' });
             if (move === null) return 'snapback';
-
+            
             updateStatus();
             
-            // Stockfish'e hamle sırasını ver
+            // Stockfish'e düşünme emri ver
             stockfish.postMessage('position fen ' + game.fen());
-            stockfish.postMessage('go depth 10'); // Zorluk seviyesi (Zaman/Derinlik)
+            stockfish.postMessage('go depth 12');
         }
 
-        function onSnapEnd () {
-            board.position(game.fen());
-        }
+        function onSnapEnd () { board.position(game.fen()); }
 
         function updateStatus () {
-            var status = 'Sıra: ' + (game.turn() === 'w' ? 'Beyaz' : 'Siyah');
-            if (game.in_checkmate()) status = 'MAT! Oyun bitti.';
+            var status = game.turn() === 'w' ? 'SIRA SİZDE' : 'ARCHITECT DÜŞÜNÜYOR...';
+            if (game.in_checkmate()) status = 'MAT! OYUN BİTTİ.';
             if (game.in_draw()) status = 'BERABERE!';
-            
-            $('#game-status').text(status.toUpperCase());
-            
-            const quotes = ["Güzel hamle Ali.", "Zayıf bir nokta buldum...", "Zamanın azalıyor.", "Analiz tamamlandı."];
+            $('#game-status').text(status);
+
+            const quotes = ["Derin bir analiz yapıyorum...", "Hamlen mantıklıydı.", "Hatanı bulmam uzun sürmez.", "Odaklan Ali."];
             if(game.turn() === 'b') $('#dialogue').text(quotes[Math.floor(Math.random() * quotes.length)]);
         }
 
@@ -217,16 +224,15 @@
             updateStatus();
         }
 
-        var config = {
+        board = Chessboard('myBoard', {
             draggable: true,
             position: 'start',
             onDragStart: onDragStart,
             onDrop: onDrop,
             onSnapEnd: onSnapEnd,
             pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-        };
+        });
 
-        board = Chessboard('myBoard', config);
         $(window).resize(board.resize);
     </script>
 </body>
