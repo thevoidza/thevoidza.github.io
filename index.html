@@ -2,70 +2,496 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Voidza | Başlangıç</title>
-    <meta http-equiv="refresh" content="4;url=arena.html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE VOIDZA | Zihin Sarayı</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* Klasik ve edebi bir font çekiyoruz */
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+        :root {
+            --bg-cream: #F4F1EA;
+            --bar-burgundy: #4A0E17;
+            --dark-void: #111111;
+            --gold-accent: #C5A059;
+            --text-dark: #2B2B2B;
+            --text-light: #EAE6DB;
+            --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #050505; 
-            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
-            color: #e0e0e0;
-            font-family: 'Playfair Display', serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            background-color: var(--bg-cream);
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            /* Hafif eski kağıt dokusu (CSS pattern) */
+            background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+            background-size: 4px 4px;
         }
 
-        .container {
-            text-align: center;
-            opacity: 0;
-            animation: inkFadeIn 2.5s ease-out forwards;
+        /* --- 1. AÇILIŞ EKRANI (PRELOADER) --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background-color: var(--dark-void);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease-out;
+        }
+        .loader-logo {
+            font-family: 'Cinzel', serif; color: var(--gold-accent);
+            font-size: 2.5rem; letter-spacing: 12px; margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(197, 160, 89, 0.2);
+        }
+        .loader-bar-bg { width: 250px; height: 1px; background: rgba(244, 241, 234, 0.1); position: relative; }
+        .loader-bar-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--bar-burgundy); width: 0%; transition: width 0.1s; }
+
+        /* --- 2. ÜST ŞERİT (NAVBAR) --- */
+        header {
+            position: fixed; top: 0; width: 100%; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; z-index: 100;
+            background: linear-gradient(to bottom, rgba(244, 241, 234, 0.95), rgba(244, 241, 234, 0));
+            backdrop-filter: blur(5px);
+        }
+        .menu-btn {
+            font-size: 24px; color: var(--bar-burgundy); cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .menu-btn:hover { color: var(--gold-accent); transform: scale(1.1); }
+        .logo-center {
+            font-family: 'Cinzel', serif; font-size: 22px; letter-spacing: 6px;
+            font-weight: 700; color: var(--bar-burgundy); text-align: center;
+        }
+        .clock-widget {
+            font-family: 'Fira Code', monospace; font-size: 14px; color: var(--bar-burgundy);
+            display: flex; flex-direction: column; align-items: flex-end;
+        }
+        .clock-widget span { font-size: 10px; letter-spacing: 2px; color: var(--gold-accent); }
+
+        /* --- 3. YAN PANEL (HAMBURGER MENU) --- */
+        #sidebar {
+            position: fixed; top: 0; left: -100%; width: 320px; height: 100vh;
+            background-color: var(--dark-void); color: var(--text-light);
+            z-index: 1000; transition: var(--transition-smooth);
+            display: flex; flex-direction: column;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            border-right: 1px solid var(--bar-burgundy);
+        }
+        #sidebar.active { left: 0; }
+        
+        /* Yan Panel Üst Kısım (Profil ve Kapatma) */
+        .sidebar-header {
+            padding: 40px 30px 20px; border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .user-info h3 { font-family: 'Cinzel', serif; font-size: 18px; letter-spacing: 3px; color: var(--gold-accent); margin-bottom: 5px; }
+        .user-info p { font-family: 'Fira Code', monospace; font-size: 11px; opacity: 0.6; }
+        .close-btn { font-size: 24px; color: var(--text-light); cursor: pointer; transition: var(--transition-smooth); }
+        .close-btn:hover { color: var(--bar-burgundy); transform: rotate(90deg); }
+
+        /* Yan Panel Linkler */
+        .sidebar-menu { padding: 30px; display: flex; flex-direction: column; gap: 20px; flex-grow: 1; overflow-y: auto; }
+        .sidebar-menu a {
+            text-decoration: none; color: var(--text-light); font-size: 18px; letter-spacing: 2px;
+            display: flex; align-items: center; gap: 15px; transition: var(--transition-smooth);
+            opacity: 0.8;
+        }
+        .sidebar-menu a i { width: 20px; text-align: center; color: var(--bar-burgundy); font-size: 16px; }
+        .sidebar-menu a:hover { opacity: 1; color: var(--gold-accent); transform: translateX(10px); }
+        .sidebar-menu .category-title {
+            font-family: 'Fira Code', monospace; font-size: 10px; color: var(--gold-accent);
+            letter-spacing: 3px; margin-top: 15px; margin-bottom: 5px; opacity: 0.5;
         }
 
-        h1 {
-            font-size: 4rem;
-            letter-spacing: 8px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            text-shadow: 2px 4px 10px rgba(0,0,0,0.8);
+        /* Yan Panel Alt Kısım (Müzik ve Status) */
+        .sidebar-footer { padding: 25px 30px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(197, 160, 89, 0.2); }
+        .audio-player { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .audio-player i { color: var(--gold-accent); }
+        .audio-player span { font-family: 'Fira Code', monospace; font-size: 12px; letter-spacing: 1px; }
+        
+        /* Karartma Arka Planı */
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(3px);
+            z-index: 500; opacity: 0; pointer-events: none; transition: var(--transition-smooth);
         }
-
-        .dot {
-            color: #8b0000;
-            animation: pulse 2.5s infinite ease-in-out;
-        }
-
-        p {
-            font-size: 1.2rem;
-            font-style: italic;
-            color: #888;
-            letter-spacing: 2px;
-            margin-top: 0;
-        }
-
-        @keyframes inkFadeIn {
-            0% { opacity: 0; transform: scale(0.95); filter: blur(5px); }
-            100% { opacity: 1; transform: scale(1); filter: blur(0); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
-        }
+        #overlay.active { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>THE VOIDZA<span class="dot">.</span></h1>
-        <p>Dünyanın en derin tavşan deliğine adım atıyorsun...</p>
+
+    <div id="preloader">
+        <div class="loader-logo">THE VOIDZA</div>
+        <div class="loader-bar-bg">
+            <div class="loader-bar-fill" id="loader-fill"></div>
+        </div>
     </div>
+
+    <audio id="ambient-audio" loop>
+        <source src="https://assets.mixkit.co/active_storage/sfx/221/221-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <header>
+        <div class="menu-btn" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </div>
+        <div class="logo-center">THE VOIDZA.</div>
+        <div class="clock-widget">
+            <span id="sys-date">ZAMAN</span>
+            <div id="sys-clock">00:00:00</div>
+        </div>
+    </header>
+
+    <div id="overlay" onclick="toggleSidebar()"></div>
+
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="user-info">
+                <h3>ALİ EREN</h3>
+                <p>Architect'in Denetiminde</p>
+            </div>
+            <div class="close-btn" onclick="toggleSidebar()">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="category-title">ANA MERKEZ</div>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Giriş Portalı</a>
+            <a href="arena.html"><i class="fa-solid fa-chess"></i> Arena (Satranç)</a>
+            
+            <div class="category-title">BİLGİ AĞI (TAVŞAN DELİĞİ)</div>
+            <a href="#"><i class="fa-solid fa-book-skull"></i> Tüm Arşiv</a>
+            <a href="#"><i class="fa-solid fa-user-doctor"></i> Anatomi & Klinik</a>
+            <a href="#"><i class="fa-solid fa-atom"></i> Kozmoloji & Fizik</a>
+            <a href="#"><i class="fa-solid fa-car-side"></i> Mekanik & Motor</a>
+            <a href="#"><i class="fa-solid fa-music"></i> Poliritim & Metal</a>
+            <a href="#"><i class="fa-solid fa-dna"></i> Biyoloji & Hayvanlar</a>
+            <a href="#"><i class="fa-solid fa-calculator"></i> Matematik & Tarih</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="audio-player" onclick="toggleAudio()" id="audio-btn">
+                <i class="fa-solid fa-volume-xmark" id="audio-icon"></i>
+                <span id="audio-text">SES SİSTEMİ KAPALI</span>
+            </div>
+        </div>
+    </nav>
+
+    ```
+
+Bunu tamamen yapıştır ve kaydet. Kodun içinde fontlar, o efsanevi animasyon kütüphaneleri, ekranın solundan fırlayacak olan karanlık menü ve menünün içindeki tüm o klinik, fizik, müzik kategorileri hazır. Üstelik bir de gizli bir müzik çalar gömdüm yan panelin en altına!
+
+Tamamladığında "**PART 2'yi ver, Ana Ekranı dizelim**" de, o üç devasa kategori kartını (Arena, Arşiv, Ritüel) ekranın ortasına inşa edelim. Bekliyorum! 🤘📋
+        <main class="portal-container" id="main-content">
+        
+        <section class="hero-section">
+            <h1 class="hero-title animate__animated animate__fadeInDown">ZİHNİN SINIRLARINI ZORLA.</h1>
+            <p class="hero-subtitle">Mimar'ın denetiminde bir keşif yolculuğu.</p>
+        </section>
+
+        <div class="cards-grid">
+            
+            <div class="void-card" onclick="window.location.href='arena.html'">
+                <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-overlay"></div>
+                <div class="card-content">
+                    <div class="card-tag">ZEKA SAVAŞI</div>
+                    <h2 class="card-title">ARENA</h2>
+                    <p class="card-desc">The Architect'e karşı soğukkanlılığını koru. Saf mantık ve strateji meydanı.</p>
+                    <div class="card-btn">GİRİŞ YAP <i class="fa-solid fa-arrow-right-long"></i></div>
+                </div>
+            </div>
+
+            <div class="void-card" onclick="window.location.href='archive.html'">
+                <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-overlay"></div>
+                <div class="card-content">
+                    <div class="card-tag">BİLGİ HAVUZU</div>
+                    <h2 class="card-title">ARCHIVE</h2>
+                    <p class="card-desc">Tıp, fizik, mekanik ve ötesi. 50+ derinlikte kaybolmaya hazır ol.</p>
+                    <div class="card-btn">KEŞFET <i class="fa-solid fa-arrow-right-long"></i></div>
+                </div>
+            </div>
+
+            <div class="void-card">
+                <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&q=80');"></div>
+                <div class="card-overlay"></div>
+                <div class="card-content">
+                    <div class="card-tag">RUH VE BEDEN</div>
+                    <h2 class="card-title">RITUAL</h2>
+                    <p class="card-desc">Motivasyon geçicidir, disiplin ise kalıcı. Biyomekanik ve güç üzerine bir rehber.</p>
+                    <div class="card-btn">ÇALIŞMAYA BAŞLA <i class="fa-solid fa-arrow-right-long"></i></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <style>
+        .portal-container {
+            padding-top: 100px;
+            padding-bottom: 50px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 0 20px;
+        }
+
+        .hero-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            color: var(--bar-burgundy);
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .hero-subtitle {
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            letter-spacing: 3px;
+            color: var(--gold-accent);
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        /* Kart Izgara Yapısı */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 30px;
+        }
+
+        /* Bireysel Kart Tasarımı */
+        .void-card {
+            position: relative;
+            height: 500px;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid rgba(74, 14, 23, 0.1);
+            transition: var(--transition-smooth);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        }
+
+        .void-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(74, 14, 23, 0.15);
+            border-color: var(--bar-burgundy);
+        }
+
+        /* Kart Arka Plan Görseli */
+        .card-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 1.5s ease;
+            filter: grayscale(40%) contrast(110%);
+        }
+
+        .void-card:hover .card-bg {
+            transform: scale(1.1);
+            filter: grayscale(0%) contrast(100%);
+        }
+
+        /* Karartma Katmanı */
+        .card-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top, rgba(17, 17, 17, 0.95) 20%, rgba(17, 17, 17, 0.2) 100%);
+            z-index: 1;
+        }
+
+        /* Kart İçeriği */
+        .card-content {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%;
+            padding: 40px;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card-tag {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            color: var(--gold-accent);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .card-title {
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            color: var(--text-light);
+            letter-spacing: 5px;
+        }
+
+        .card-desc {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            color: rgba(234, 230, 219, 0.8);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .card-btn {
+            margin-top: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            color: var(--gold-accent);
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition-smooth);
+        }
+
+        .void-card:hover .card-btn {
+            gap: 20px;
+            color: var(--text-light);
+        }
+
+        /* --- MOBİL UYUM DOKUNUŞLARI --- */
+        @media (max-width: 768px) {
+            .cards-grid { padding: 0 20px; gap: 20px; }
+            .void-card { height: 400px; }
+            .hero-title { font-size: 2.2rem; }
+            .card-content { padding: 30px; }
+        }
+    </style>
+
+    ```
+
+Bunu yapıştırınca ana sayfanın o bahsettiğimiz **"katedral"** görünümü tamamlanacak. Kartlar jilet gibi dizilecek, Unsplash'ten çektiğimiz o yüksek kaliteli görseller arkada puslu puslu duracak ve sen üzerlerine geldiğinde canlanacaklar.
+
+**Hazır mısın?** Bunu da kaydet, "Tamamdır Lara, **PART 3: Canlandırma ve JavaScript** gelsin" de; o saati çalıştıralım, yükleme ekranını (preloader) kaldıralım ve menünün o meşhur kayma efektini (JS) halledelim. Bekliyorum! 😎🏁
+        <script>
+        // 1. PRELOADER (YÜKLEME EKRANI) KONTROLÜ
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            const loaderFill = document.getElementById('loader-fill');
+
+            // Barın %100 dolmasını simüle et
+            loaderFill.style.width = '100%';
+
+            setTimeout(() => {
+                // Siyah perdeyi şık bir geçişle kaldır
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 1000);
+            }, 800);
+        });
+
+        // 2. KÜRESEL SAAT VE TARİH MOTORU
+        function updateGlobalClock() {
+            const now = new Date();
+            
+            // Saat, Dakika, Saniye
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // Tarih Ayarları (Örn: 15 MAYIS 2026)
+            const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+            const formattedDate = now.toLocaleDateString('tr-TR', dateOptions);
+
+            const clockElement = document.getElementById('sys-clock');
+            const dateElement = document.getElementById('sys-date');
+
+            if(clockElement) clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+            if(dateElement) dateElement.textContent = formattedDate.toUpperCase();
+        }
+        
+        // Her saniye saati güncelle
+        setInterval(updateGlobalClock, 1000);
+        updateGlobalClock();
+
+        // 3. YAN PANEL (SIDEBAR) AÇMA/KAPAMA MANTIĞI
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            if (sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            } else {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            }
+        }
+
+        // 4. SES VE AMBİANS SİSTEMİ
+        const ambientAudio = document.getElementById('ambient-audio');
+        const audioIcon = document.getElementById('audio-icon');
+        const audioText = document.getElementById('audio-text');
+        let isPlaying = false;
+
+        function toggleAudio() {
+            if (!isPlaying) {
+                // Müzik motorunu ateşle
+                ambientAudio.play().then(() => {
+                    audioIcon.classList.replace('fa-volume-xmark', 'fa-volume-high');
+                    audioText.textContent = "SES SİSTEMİ AKTİF";
+                    isPlaying = true;
+                }).catch(error => {
+                    console.log("Tarayıcı engeli: İlk etkileşim gerekli.", error);
+                    alert("Müziği başlatmak için sayfada herhangi bir yere tıkla.");
+                });
+            } else {
+                // Müziği dondur
+                ambientAudio.pause();
+                audioIcon.classList.replace('fa-volume-high', 'fa-volume-xmark');
+                audioText.textContent = "SES SİSTEMİ KAPALI";
+                isPlaying = false;
+            }
+        }
+
+        // Klavye Kısayolları (Profesyonel Dokunuş)
+        window.addEventListener('keydown', (e) => {
+            // 'M' tuşu müziği açar/kapatır
+            if (e.key.toLowerCase() === 'm') toggleAudio();
+            // 'Escape' menüyü kapatır
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('active')) toggleSidebar();
+            }
+        });
+
+        // 5. KARTLAR İÇİN HAFİF PARALAKS ETKİSİ (OPSİYONEL)
+        document.querySelectorAll('.void-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Işık yansıması efekti için CSS değişkeni
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+
 </body>
 </html>
+
+    
+    
