@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Voidza | Başlangıç</title>
+    <meta http-equiv="refresh" content="4;url=arena.html">
+    <style>
+        /* Klasik ve edebi bir font çekiyoruz */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505; 
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            color: #e0e0e0;
+            font-family: 'Playfair Display', serif; /* Dijital değil, roman gibi */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            opacity: 0;
+            /* Mürekkep gibi yavaşça beliren animasyon */
+            animation: inkFadeIn 2.5s ease-out forwards;
+        }
+
+        h1 {
+            font-size: 4rem;
+            letter-spacing: 8px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.8);
+        }
+
+        .dot {
+            color: #8b0000; /* Koyu, kan kırmızısı zarif nokta */
+            animation: pulse 2.5s infinite ease-in-out;
+        }
+
+        p {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #888;
+            letter-spacing: 2px;
+            margin-top: 0;
+        }
+
+        @keyframes inkFadeIn {
+            0% { opacity: 0; transform: scale(0.95); filter: blur(5px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        /* Noktanın kalp gibi sakin atması */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>THE VOIDZA<span class="dot">.</span></h1>
+        <p>Dünyanın en derin tavşan deliğine adım atıyorsun...</p>
+    </div>
+</body>
+</html>
