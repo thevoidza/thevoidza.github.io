@@ -1,1 +1,78 @@
+:root {
+    --bg-dark: #0a0a0a;
+    --panel-bg: #111111;
+    --text-main: #d4d4d4;
+    --text-muted: #888888;
+    --accent: #8b0000; /* Koyu kan kırmızısı */
+    --border-col: #222222;
+}
 
+body {
+    margin: 0; padding: 0;
+    background-color: var(--bg-dark);
+    background-image: radial-gradient(circle at center, #151515 0%, #050505 100%);
+    color: var(--text-main);
+    font-family: 'Lora', serif; /* Edebi, okuması keyifli font */
+    overflow-x: hidden;
+}
+
+h1, h2, h3, .logo, .boss-title, .panel-title {
+    font-family: 'Playfair Display', serif;
+    margin: 0;
+}
+
+.arena-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    grid-template-rows: 70px 1fr;
+    height: 100vh;
+}
+
+/* ÜST BAR */
+header {
+    grid-column: 1 / -1;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 30px; border-bottom: 1px solid var(--border-col);
+    background: #050505;
+}
+.logo { font-size: 24px; letter-spacing: 4px; font-weight: 700; color: #fff;}
+.dot { color: var(--accent); }
+#clock { font-size: 14px; color: var(--text-muted); font-style: italic; letter-spacing: 1px;}
+
+/* PANELLER */
+.panel { padding: 25px; overflow-y: auto; background: var(--panel-bg); }
+#left-panel { border-right: 1px solid var(--border-col); }
+#right-panel { border-left: 1px solid var(--border-col); }
+#center-panel { display: flex; justify-content: center; align-items: center; padding: 20px; }
+
+/* SATRANÇ */
+#myBoard { width: 100%; max-width: 450px; border: 4px solid #1a1a1a; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+
+/* BOSS ALANI */
+.boss-title { font-size: 16px; letter-spacing: 2px; color: #fff; margin-bottom: 15px; text-align: center;}
+.boss-bubble {
+    background: #1a1a1a; border-left: 3px solid var(--accent);
+    padding: 18px; font-style: italic; font-size: 15px; color: #ccc;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    line-height: 1.5;
+}
+
+/* BİLGİ HAVUZU KARTLARI */
+.panel-title { font-size: 14px; letter-spacing: 3px; text-align: center; border-bottom: 1px solid var(--border-col); padding-bottom: 15px; margin-bottom: 20px; color: #fff; }
+.info-card {
+    background: #151515; border: 1px solid var(--border-col); margin-bottom: 20px; cursor: pointer; transition: 0.4s;
+}
+.info-card:hover { border-color: var(--accent); }
+/* Resimler hafif renksiz/eskitilmiş duracak, fareyi üstüne getirince canlanacak */
+.info-img { width: 100%; height: 140px; object-fit: cover; opacity: 0.7; filter: grayscale(50%); transition: 0.4s; }
+.info-card:hover .info-img { opacity: 1; filter: grayscale(0%); }
+.info-content { padding: 15px; }
+.info-cat { font-family: 'Playfair Display', serif; font-size: 12px; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px;}
+.info-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+
+/* MOBİL UYUM */
+@media (max-width: 900px) {
+    .arena-layout { display: flex; flex-direction: column; height: auto; }
+    #left-panel, #right-panel { border: none; border-bottom: 1px solid var(--border-col); height: auto; }
+    #center-panel { padding: 40px 10px; }
+}
