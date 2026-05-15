@@ -15,7 +15,7 @@
             background-color: #050505; 
             background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
             color: #e0e0e0;
-            font-family: 'Playfair Display', serif; /* Dijital değil, roman gibi */
+            font-family: 'Playfair Display', serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -26,7 +26,6 @@
         .container {
             text-align: center;
             opacity: 0;
-            /* Mürekkep gibi yavaşça beliren animasyon */
             animation: inkFadeIn 2.5s ease-out forwards;
         }
 
@@ -40,7 +39,7 @@
         }
 
         .dot {
-            color: #8b0000; /* Koyu, kan kırmızısı zarif nokta */
+            color: #8b0000;
             animation: pulse 2.5s infinite ease-in-out;
         }
 
@@ -57,7 +56,6 @@
             100% { opacity: 1; transform: scale(1); filter: blur(0); }
         }
 
-        /* Noktanın kalp gibi sakin atması */
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.2; }
