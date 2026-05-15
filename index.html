@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Voidza | Giriş</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #00ffcc;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+        }
+        .loading {
+            text-align: center;
+        }
+        .shimmer {
+            font-size: 24px;
+            letter-spacing: 5px;
+            animation: glow 2s infinite ease-in-out;
+        }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px #00ffcc; opacity: 0.5; }
+            50% { text-shadow: 0 0 30px #00ffcc; opacity: 1; }
+        }
+    </style>
+    <meta http-equiv="refresh" content="3;url=anamenu.html">
+</head>
+<body>
+    <div class="loading">
+        <div class="shimmer">THE VOIDZA YÜKLENİYOR...</div>
+    </div>
+</body>
+</html>
