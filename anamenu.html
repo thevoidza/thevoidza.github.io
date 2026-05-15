@@ -2,65 +2,76 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>The Voidza | Satranç Üssü</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Voidza | Rakip Sahada</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <style>
         body {
             margin: 0;
-            background: radial-gradient(circle, #1a1a2e, #0a0a0a);
+            /* Arka plana karizmatik bir adam görseli ekledik */
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
             height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Arkadaki Baloncuklar Animasyonu */
-        .bubbles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-        .bubble {
-            position: absolute;
-            bottom: -100px;
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 255, 204, 0.1);
-            border-radius: 50%;
-            animation: rise 10s infinite ease-in;
-        }
-        @keyframes rise {
-            0% { bottom: -100px; transform: translateX(0); }
-            50% { transform: translateX(100px); }
-            100% { bottom: 100vh; transform: translateX(-100px); }
-        }
-
-        /* Satranç Alanı */
-        .game-container {
+        /* Konuşma Balonu */
+        .speech-bubble {
             position: relative;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.05);
+            background: #fff;
+            border-radius: .4em;
+            padding: 15px;
+            margin-bottom: 30px;
+            width: 250px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            animation: pop 0.3s ease-out;
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border: 20px solid transparent;
+            border-top-color: #fff;
+            border-bottom: 0;
+            border-left: 0;
+            margin-left: -10px;
+            margin-bottom: -20px;
+        }
+
+        .game-container {
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
             padding: 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(0, 255, 204, 0.3);
-            box-shadow: 0 0 50px rgba(0, 255, 204, 0.2);
-            width: 400px;
+            border-radius: 10px;
+            border: 2px solid #00ffcc;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
         }
-        h2 { color: #00ffcc; text-align: center; margin-top: 0; text-shadow: 0 0 10px #00ffcc; }
-        #myBoard { width: 100%; border: 2px solid #333; }
+
+        #myBoard { width: 350px; }
+        h2 { color: #00ffcc; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
 
-    <div class="bubbles">
-        <div class="bubble" style="left: 10%; width: 60px; height: 60px; animation-delay: 0s;"></div>
-        <div class="bubble" style="left: 30%; width: 20px; height: 20px; animation-delay: 2s;"></div>
-        <div class="bubble" style="left: 70%; width: 50px; height: 50px; animation-delay: 4s;"></div>
-        <div class="bubble" style="left: 90%; width: 30px; height: 30px; animation-delay: 1s;"></div>
+    <div class="speech-bubble" id="boss-text">
+        Hamle yapmanı bekliyorum ezik, korktun mu?
     </div>
 
     <div class="game-container">
@@ -73,15 +84,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 
     <script>
-        var board = null
-        var game = new Chess()
+        var board = null;
+        var game = new Chess();
+        var bossText = document.getElementById('boss-text');
+
+        // Laf sokma listesi
+        const insultMoves = [
+            "Bu ne biçim hamle? Babam bile daha iyi oynar!",
+            "Gerçekten bunu mu yapacaksın? Acıdım sana...",
+            "Satranç bildiğine emin misin? Dama oyna istersen.",
+            "Tebrikler, oyunu bana hediye ettin. Geri zekalıca bir hamle!",
+            "Sıkıldım, biraz hızlı oyna be kaplumbağa!",
+            "Şahını koru evlat, çünkü ben geliyorum!"
+        ];
+
+        const praiseMoves = [
+            "Ha? Şanslıydın sadece, sevinme hemen.",
+            "Fena değil... Ama hala benden kötüsün.",
+            "Bak bak, hobi olarak yine iyi oynuyorsun.",
+            "Ooo, birileri YouTube'dan açılış çalışmış."
+        ];
+
+        function updateStatus(isGoodMove) {
+            let list = isGoodMove ? praiseMoves : insultMoves;
+            let randomText = list[Math.floor(Math.random() * list.length)];
+            bossText.innerText = randomText;
+            // Baloncuğu canlandırmak için
+            bossText.style.animation = 'none';
+            bossText.offsetHeight; 
+            bossText.style.animation = null; 
+        }
 
         function makeRandomMove () {
-          var possibleMoves = game.moves()
-          if (possibleMoves.length === 0) return
-          var randomIdx = Math.floor(Math.random() * possibleMoves.length)
-          game.move(possibleMoves[randomIdx])
-          board.position(game.fen())
+          var possibleMoves = game.moves();
+          if (possibleMoves.length === 0) {
+              bossText.innerText = "Bitti! Yine kaybettin, şaşırdık mı? Tabii ki hayır.";
+              return;
+          }
+
+          var randomIdx = Math.floor(Math.random() * possibleMoves.length);
+          game.move(possibleMoves[randomIdx]);
+          board.position(game.fen());
         }
 
         function onDrop (source, target) {
@@ -89,17 +132,23 @@
             from: source,
             to: target,
             promotion: 'q' 
-          })
-          if (move === null) return 'snapback'
-          window.setTimeout(makeRandomMove, 250)
+          });
+
+          if (move === null) return 'snapback';
+
+          // Hamle kalitesine göre laf sok (Rastgele iyi/kötü gibi davranıyoruz şimdilik)
+          updateStatus(Math.random() > 0.7);
+
+          window.setTimeout(makeRandomMove, 500);
         }
 
         var config = {
           draggable: true,
           position: 'start',
-          onDrop: onDrop
-        }
-        board = Chessboard('myBoard', config)
+          onDrop: onDrop,
+          pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+        };
+        board = Chessboard('myBoard', config);
     </script>
 </body>
 </html>
