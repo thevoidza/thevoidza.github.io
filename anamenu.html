@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>The Voidza | Satranç Üssü</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle, #1a1a2e, #0a0a0a);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Arkadaki Baloncuklar Animasyonu */
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 255, 204, 0.1);
+            border-radius: 50%;
+            animation: rise 10s infinite ease-in;
+        }
+        @keyframes rise {
+            0% { bottom: -100px; transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { bottom: 100vh; transform: translateX(-100px); }
+        }
+
+        /* Satranç Alanı */
+        .game-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            box-shadow: 0 0 50px rgba(0, 255, 204, 0.2);
+            width: 400px;
+        }
+        h2 { color: #00ffcc; text-align: center; margin-top: 0; text-shadow: 0 0 10px #00ffcc; }
+        #myBoard { width: 100%; border: 2px solid #333; }
+    </style>
+</head>
+<body>
+
+    <div class="bubbles">
+        <div class="bubble" style="left: 10%; width: 60px; height: 60px; animation-delay: 0s;"></div>
+        <div class="bubble" style="left: 30%; width: 20px; height: 20px; animation-delay: 2s;"></div>
+        <div class="bubble" style="left: 70%; width: 50px; height: 50px; animation-delay: 4s;"></div>
+        <div class="bubble" style="left: 90%; width: 30px; height: 30px; animation-delay: 1s;"></div>
+    </div>
+
+    <div class="game-container">
+        <h2>THE VOIDZA CHESS</h2>
+        <div id="myBoard"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+    <script>
+        var board = null
+        var game = new Chess()
+
+        function makeRandomMove () {
+          var possibleMoves = game.moves()
+          if (possibleMoves.length === 0) return
+          var randomIdx = Math.floor(Math.random() * possibleMoves.length)
+          game.move(possibleMoves[randomIdx])
+          board.position(game.fen())
+        }
+
+        function onDrop (source, target) {
+          var move = game.move({
+            from: source,
+            to: target,
+            promotion: 'q' 
+          })
+          if (move === null) return 'snapback'
+          window.setTimeout(makeRandomMove, 250)
+        }
+
+        var config = {
+          draggable: true,
+          position: 'start',
+          onDrop: onDrop
+        }
+        board = Chessboard('myBoard', config)
+    </script>
+</body>
+</html>
